@@ -1,0 +1,18 @@
+{
+    "token": "",
+    "clientId": "",
+    "guildId": "",
+    "admin": "",
+    "adminChannel": "",
+    "debug": false,
+    "guilds": [],
+    "channels": [],
+    "twitter": {
+        "enable": true
+    },
+    "icon": {
+        "enable": true,
+        "users": [],
+        "sendChannel": ""
+    }
+}
