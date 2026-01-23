@@ -87,12 +87,13 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     if (oldUser.avatar === newUser.avatar) return;
 
     console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
-    const url = newUser.avatarURL({ size: 4096});
+    const url = newUser.displayAvatarURL({ size: 4096});
     const channel = client.channels.cache.get(config.adminChannel);
     const embed = new EmbedBuilder()
         .setTitle(`${oldUser.username} changes avatar`)
         .setImage(url)
-        .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'});
+        .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
+        .setTimestamp();
     await channel.send({ embeds: [embed] });
 
     if (config.debug) console.log(embed);
