@@ -33,6 +33,13 @@ client.once(Events.ClientReady, (readyClient) => {
     console.log('set activity > discord.js Playing...');
     console.log(`${process.platform}/${process.arch} / node@${process.version} / discord.js ${version} (API v${APIVersion})`);
     console.log(`------------- ${pkg.name} v${pkg.version} -------------`);
+
+    if (config.icon) {
+        config.icon.users.forEach(async userId => {
+            const user = await readyClient.users.fetch(userId);
+            console.log(`fetched user > @${user.username}(${user.id})`)
+        })
+    }
 })
 
 client.commands = new Collection();
