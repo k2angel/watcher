@@ -108,10 +108,12 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     if (config.debug) console.log(embed);
     console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
 
-    const urlPath = new URL(url).pathname;
-    const fileName = path.basename(urlPath);
-    const dest = path.join(attachmentsPath, "icons", newUser.id, fileName);
-    await download(url, dest);
+    if (newUser.avatar) {
+        const urlPath = new URL(url).pathname;
+        const fileName = path.basename(urlPath);
+        const dest = path.join(attachmentsPath, "icons", newUser.id, fileName);
+        await download(url, dest);
+    };
 })
 
 client.on(Events.MessageCreate, async msg => {
