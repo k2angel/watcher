@@ -156,7 +156,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
         if (newUser.avatar) {
             const urlPath = new URL(url).pathname;
             const fileName = path.basename(urlPath);
-            const dest = path.join(attachmentsPath, "icons", newUser.id, fileName);
+            const dest = path.join(attachmentsPath, "avatars", newUser.id, fileName);
             await download(url, dest);
         };
     }
