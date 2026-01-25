@@ -140,7 +140,7 @@ client.on(Events.MessageCreate, async msg => {
         })
     }
 
-    if (config.twitter) {
+    if (config.twitter.enable) {
         result = getVxtwitterUrls(msg.content);
         if (!result.length) return;
         result.forEach(async vxtwitterUrl => {
