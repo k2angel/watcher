@@ -93,9 +93,11 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     if (!config.icon.users.includes(oldUser.id)) return;
     if (oldUser.avatar === newUser.avatar) return;
 
+    const channelId = config.icon.sendChannel || config.adminChannel;
+    const channel = client.channels.cache.get(channelId);
+
     console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
     const url = newUser.displayAvatarURL({ size: 4096});
-    const channel = client.channels.cache.get(config.adminChannel);
     const embed = new EmbedBuilder()
         .setTitle(`${oldUser.username} changes avatar`)
         .setImage(url)
