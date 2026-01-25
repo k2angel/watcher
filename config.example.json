@@ -7,12 +7,14 @@
     "debug": false,
     "guilds": [],
     "channels": [],
-    "twitter": {
-        "enable": true
-    },
-    "icon": {
-        "enable": true,
+    "profile": {
+        "username": true,
+        "displayName": true,
+        "icon": true,
         "users": [],
         "sendChannel": ""
+    },
+    "twitter": {
+        "enable": true
     }
 }

@@ -4,6 +4,7 @@ const path = require('node:path');
 const { version, APIVersion } = require('discord.js')
 const { Client, Events, GatewayIntentBits, Partials } = require('discord.js');
 const { Collection, MessageFlags, EmbedBuilder, ActivityType } = require('discord.js');
+
 const { download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp } = require("./utils.js");
 const config = require("./config.json");
 const pkg = require('./package.json');
@@ -34,8 +35,8 @@ client.once(Events.ClientReady, (readyClient) => {
     console.log(`${process.platform}/${process.arch} / node@${process.version} / discord.js ${version} (API v${APIVersion})`);
     console.log(`------------- ${pkg.name} v${pkg.version} -------------`);
 
-    if (config.icon) {
-        config.icon.users.forEach(async userId => {
+    if (config.profile.users.length) {
+        config.profile.users.forEach(async userId => {
             const user = await readyClient.users.fetch(userId);
             console.log(`fetched user > @${user.username}(${user.id})`)
         })
@@ -90,30 +91,75 @@ for (const folder of commandFolders) {
 }
 
 client.on(Events.UserUpdate, async (oldUser, newUser) => {
-    if (!config.icon.users.includes(oldUser.id)) return;
-    if (oldUser.avatar === newUser.avatar) return;
+    if (!config.profile.users.includes(oldUser.id)) return;
 
-    const channelId = config.icon.sendChannel || config.adminChannel;
+    const channelId = config.profile.sendChannel || config.adminChannel;
     const channel = client.channels.cache.get(channelId);
 
-    console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
-    const url = newUser.displayAvatarURL({ size: 4096});
-    const embed = new EmbedBuilder()
-        .setTitle(`${oldUser.username} changes avatar`)
-        .setImage(url)
-        .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
-        .setTimestamp();
-    await channel.send({ embeds: [embed] });
+    if (config.profile.username && oldUser.username != newUser.username) {
+        console.log(`updated username > @${oldUser.username} to @${newUser.username}`);
+        const embed = new EmbedBuilder()
+            .setTitle(`${oldUser.username} changes username`)
+            .setDescription(
+                'old\n' +
+                '```\n' +
+                oldUser.username +
+                '\n```\n' +
+                'new\n' +
+                '```\n' +
+                newUser.username +
+                '\n```'
+            )
+            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
+            .setTimestamp();
+        await channel.send({ embeds: [embed] });
 
-    if (config.debug) console.log(embed);
-    console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+        if (config.debug) console.log(embed);
+        console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+    }
 
-    if (newUser.avatar) {
-        const urlPath = new URL(url).pathname;
-        const fileName = path.basename(urlPath);
-        const dest = path.join(attachmentsPath, "icons", newUser.id, fileName);
-        await download(url, dest);
-    };
+    if (config.profile.displayName && oldUser.displayName != newUser.displayName) {
+        console.log(`updated displayName @${oldUser.username} > ${oldUser.displayName} to ${newUser.displayName}`);
+        const embed = new EmbedBuilder()
+            .setTitle(`${oldUser.username} changed displayName`)
+            .setDescription(
+                'old\n' +
+                '```\n' +
+                oldUser.displayName +
+                '\n```\n' +
+                'new\n' +
+                '```\n' +
+                newUser.displayName +
+                '\n```'
+            )
+            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
+            .setTimestamp();
+        await channel.send({ embeds: [embed] });
+
+        if (config.debug) console.log(embed);
+        console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+    }
+
+    if (config.profile.avatar && oldUser.avatar != newUser.avatar) {
+        console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
+        const url = newUser.displayAvatarURL({ size: 4096});
+        const embed = new EmbedBuilder()
+            .setTitle(`${oldUser.username} changes avatar`)
+            .setImage(url)
+            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
+            .setTimestamp();
+        await channel.send({ embeds: [embed] });
+
+        if (config.debug) console.log(embed);
+        console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+
+        if (newUser.avatar) {
+            const urlPath = new URL(url).pathname;
+            const fileName = path.basename(urlPath);
+            const dest = path.join(attachmentsPath, "icons", newUser.id, fileName);
+            await download(url, dest);
+        };
+    }
 })
 
 client.on(Events.MessageCreate, async msg => {
