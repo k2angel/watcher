@@ -10,7 +10,7 @@
     "profile": {
         "username": true,
         "displayName": true,
-        "icon": true,
+        "avatar": true,
         "users": [],
         "sendChannel": ""
     },
