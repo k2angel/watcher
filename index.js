@@ -195,11 +195,13 @@ client.on(Events.MessageCreate, async msg => {
         if (!result.length) return;
         result.forEach(async vxtwitterUrl => {
             const mediaURLs = await getTwitterMediaURLs(vxtwitterUrl);
-            mediaURLs.forEach(async url => {
-                const urlPath = new URL(url).pathname;
-                const fileName = path.basename(urlPath);
+            mediaURLs.forEach(async mediaURL => {
+                const url = new URL(mediaURL);
+                const urlPath = url.pathname;
+                const urlFormat = url.searchParams.get('format');
+                const fileName = urlFormat ? `${path.basename(urlPath)}.${urlFormat}` : path.basename(urlPath);
                 const dest = path.join(dir, fileName);
-                await download(url, dest);
+                await download(mediaURL, dest);
                 await updateTimestamp(dest, timestamp);
             })
         })
