@@ -178,7 +178,7 @@ client.on(Events.MessageCreate, async msg => {
         await updateTimestamp(dest, timestamp);
     })
 
-    if (msg.messageSnapshots != undefined) {
+    if (msg.messageSnapshots) {
         const snapshots = msg.messageSnapshots;
         snapshots.forEach(snapshot => {
             const attachments = snapshot.attachments;
