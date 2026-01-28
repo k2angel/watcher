@@ -3,11 +3,10 @@ const path = require('node:path');
 
 const { version, APIVersion } = require('discord.js')
 const { Client, Events, GatewayIntentBits, Partials } = require('discord.js');
-const { Collection, MessageFlags, EmbedBuilder, ActivityType } = require('discord.js');
+const { Collection, MessageFlags, ActivityType } = require('discord.js');
 
-const { download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp } = require("./utils.js");
-const config = require("./config.json");
-const pkg = require('./package.json');
+const { embedTemplate, download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp } = require("./utils.js");
+const { config, pkg } = require('./vars.js');
 
 const client = new Client({
     intents: [
@@ -98,8 +97,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
 
     if (config.profile.username && oldUser.username != newUser.username) {
         console.log(`updated username > @${oldUser.username} to @${newUser.username}`);
-        const embed = new EmbedBuilder()
-            .setTitle(`${oldUser.username} changes username`)
+        const embed = embedTemplate(`${oldUser.username} changes username`)
             .setDescription(
                 'old\n' +
                 '```\n' +
@@ -109,9 +107,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
                 '```\n' +
                 newUser.username +
                 '\n```'
-            )
-            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
-            .setTimestamp();
+            );
         await channel.send({ embeds: [embed] });
 
         if (config.debug) console.log(embed);
@@ -120,8 +116,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
 
     if (config.profile.displayName && oldUser.displayName != newUser.displayName) {
         console.log(`updated displayName @${oldUser.username} > ${oldUser.displayName} to ${newUser.displayName}`);
-        const embed = new EmbedBuilder()
-            .setTitle(`${oldUser.username} changed displayName`)
+        const embed = embedTemplate(`${oldUser.username} changed displayName`)
             .setDescription(
                 'old\n' +
                 '```\n' +
@@ -131,9 +126,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
                 '```\n' +
                 newUser.displayName +
                 '\n```'
-            )
-            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
-            .setTimestamp();
+            );
         await channel.send({ embeds: [embed] });
 
         if (config.debug) console.log(embed);
@@ -143,11 +136,8 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     if (config.profile.avatar && oldUser.avatar != newUser.avatar) {
         console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
         const url = newUser.displayAvatarURL({ size: 4096});
-        const embed = new EmbedBuilder()
-            .setTitle(`${oldUser.username} changes avatar`)
-            .setImage(url)
-            .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
-            .setTimestamp();
+        const embed = embedTemplate(`${oldUser.username} changes avatar`)
+            .setImage(url);
         await channel.send({ embeds: [embed] });
 
         if (config.debug) console.log(embed);

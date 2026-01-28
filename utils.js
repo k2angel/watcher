@@ -3,6 +3,23 @@ const { stat, utimes } = require('node:fs/promises');
 const path = require('node:path');
 const { pipeline } = require('node:stream/promises');
 
+const { EmbedBuilder } = require('discord.js');
+
+const { pkg } = require('./vars.js');
+
+
+/**
+ *
+ * @param {string} title
+ */
+function embedTemplate(title) {
+    const embed = new EmbedBuilder()
+        .setTitle(title)
+        .setFooter({ text: `${pkg.name} v${pkg.version}`, iconURL: 'https://github.com/identicons/k2angel.png'})
+        .setTimestamp();
+    return embed
+}
+
 /**
  *
  * @param {string} url
@@ -54,4 +71,4 @@ async function updateTimestamp(dest, mtime) {
     console.log(`update timestamp "${relativePath}" > ${s.mtime.getTime()} to ${mtime.getTime()}`);
 }
 
-module.exports = { download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp }
+module.exports = { embedTemplate, download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp }
