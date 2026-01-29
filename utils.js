@@ -5,7 +5,7 @@ const { pipeline } = require('node:stream/promises');
 
 const { EmbedBuilder } = require('discord.js');
 
-const { pkg } = require('./vars.js');
+const { config, pkg } = require('./vars.js');
 
 
 /**
@@ -29,6 +29,7 @@ async function download(url, dest) {
     const dir = path.dirname(dest);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.statusText}`);
+    if (res.headers.get('Content-Length') / (1024 * 1024) > config.sizeLimit) return;
 
     fs.mkdirSync(dir, { recursive: true });
     await pipeline(res.body, fs.createWriteStream(dest));

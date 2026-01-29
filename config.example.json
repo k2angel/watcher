@@ -5,6 +5,7 @@
     "admin": "",
     "adminChannel": "",
     "debug": false,
+    "sizeLimit": "",
     "guilds": [],
     "channels": [],
     "profile": {
