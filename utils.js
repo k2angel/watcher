@@ -66,6 +66,8 @@ function getVxtwitterUrls(text) {
  * @param {Date|number} mtime
  */
 async function updateTimestamp(dest, mtime) {
+    if (!fs.existsSync(dest)) return;
+    
     const s = await stat(dest);
     await utimes(dest, s.atime, mtime);
     const relativePath = path.relative(__dirname, dest);
