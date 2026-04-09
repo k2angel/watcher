@@ -1,4 +1,4 @@
-const config = require('./config.json');
-const pkg = require('./package.json');
+import config from './config.json' with { type: 'json' };
+import pkg from './package.json' with { type: 'json' };
 
-module.exports = { config, pkg }
+export { config, pkg };

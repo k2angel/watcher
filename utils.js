@@ -1,11 +1,11 @@
-const fs = require('node:fs');
-const { stat, utimes } = require('node:fs/promises');
-const path = require('node:path');
-const { pipeline } = require('node:stream/promises');
+import fs from 'node:fs';
+import { stat, utimes } from 'node:fs/promises';
+import path from 'node:path'
+import { pipeline } from 'node:stream/promises';
 
-const { EmbedBuilder } = require('discord.js');
+import { EmbedBuilder } from 'discord.js';
 
-const { config, pkg } = require('./vars.js');
+import { config, pkg } from './vars.js'
 
 
 /**
@@ -34,7 +34,7 @@ async function download(url, dest) {
   fs.mkdirSync(dir, { recursive: true });
   await pipeline(res.body, fs.createWriteStream(dest));
   const domain = new URL(url).hostname;
-  const relativePath = path.relative(__dirname, dest);
+  const relativePath = path.relative(process.cwd(), dest);
   console.log(`saved > ${domain} to "${relativePath}"`);
 };
 
@@ -70,8 +70,8 @@ async function updateTimestamp(dest, mtime) {
 
   const s = await stat(dest);
   await utimes(dest, s.atime, mtime);
-  const relativePath = path.relative(__dirname, dest);
+  const relativePath = path.relative(process.cwd(), dest);
   console.log(`update timestamp "${relativePath}" > ${s.mtime.getTime()} to ${mtime.getTime()}`);
 }
 
-module.exports = { embedTemplate, download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp }
+export { embedTemplate, download, getTwitterMediaURLs, getVxtwitterUrls, updateTimestamp }
