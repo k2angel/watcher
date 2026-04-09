@@ -51,6 +51,10 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+  const channel = readyClient.channels.cache.get(config.adminChannel);
+  const message = `${pkg.name} v${pkg.version} has launched`
+  channel.send(message)
+  console.log(`${channel.id} @${readyClient.user.tag}(${readyClient.user.id}) > ${message}`);
   readyClient.user.setActivity('discord.js', { type: ActivityType.Playing });
   console.log('set activity > discord.js Playing...');
   console.log(`${process.platform}/${process.arch} / node@${process.version} / discord.js ${version} (API v${APIVersion})`);
