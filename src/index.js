@@ -30,7 +30,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-const foldersPath = path.join(process.cwd(), 'commands');
+const foldersPath = path.join(process.cwd(), 'src', 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
