@@ -1,6 +1,7 @@
+.direnv
 attachments
 node_modules
-releases
+
 config.json
 deleteCommands.js
 test.js
