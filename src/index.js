@@ -1,15 +1,20 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
-import { version, APIVersion } from 'discord.js';
-import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
-import { Collection, MessageFlags, ActivityType } from 'discord.js';
+import { version, APIVersion } from "discord.js";
+import { Client, Events, GatewayIntentBits, Partials } from "discord.js";
+import { Collection, MessageFlags, ActivityType } from "discord.js";
 
-import { embedTemplate, download, getTwitterMediaURLs, getVxtwitterUrls , updateTimestamp } from './utils.js';
-import { config, pkg } from './vars.js';
+import {
+  embedTemplate,
+  download,
+  getTwitterMediaURLs,
+  getVxtwitterUrls,
+  updateTimestamp,
+} from "./utils.js";
+import { config, pkg } from "./vars.js";
 
-
-const attachmentsPath = path.join(process.cwd(), 'attachments');
+const attachmentsPath = path.join(process.cwd(), "attachments");
 if (!fs.existsSync(attachmentsPath)) fs.mkdirSync(attachmentsPath);
 
 const client = new Client({
@@ -17,34 +22,38 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
   ],
   partials: [
     Partials.User,
     Partials.GuildMember,
     Partials.Channel,
     Partials.Message,
-    Partials.Reaction
-  ]
+    Partials.Reaction,
+  ],
 });
 
 client.commands = new Collection();
 
-const foldersPath = path.join(process.cwd(), 'src', 'commands');
+const foldersPath = path.join(process.cwd(), "src", "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
   const commandsPath = path.join(foldersPath, folder);
-  const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith(".js"));
 
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = await import(`file://${filePath}`);
     // Set a new item in the Collection with the key as the command name and the value as the exported module
-    if ('data' in command && 'execute' in command) {
+    if ("data" in command && "execute" in command) {
       client.commands.set(command.data.name, command);
     } else {
-      console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+      console.log(
+        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
+      );
     }
   }
 }
@@ -52,21 +61,25 @@ for (const folder of commandFolders) {
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
   const channel = readyClient.channels.cache.get(config.adminChannel);
-  const message = `${pkg.name} v${pkg.version} has launched`
-  channel.send(message)
-  console.log(`${channel.id} @${readyClient.user.tag}(${readyClient.user.id}) > ${message}`);
-  readyClient.user.setActivity('discord.js', { type: ActivityType.Playing });
-  console.log('set activity > discord.js Playing...');
-  console.log(`${process.platform}/${process.arch} / node@${process.version} / discord.js ${version} (API v${APIVersion})`);
+  const message = `${pkg.name} v${pkg.version} has launched`;
+  channel.send(message);
+  console.log(
+    `${channel.id} @${readyClient.user.tag}(${readyClient.user.id}) > ${message}`,
+  );
+  readyClient.user.setActivity("discord.js", { type: ActivityType.Playing });
+  console.log("set activity > discord.js Playing...");
+  console.log(
+    `${process.platform}/${process.arch} / node@${process.version} / discord.js ${version} (API v${APIVersion})`,
+  );
   console.log(`------------- ${pkg.name} v${pkg.version} -------------`);
 
   if (config.profile.users.length) {
-    config.profile.users.forEach(async userId => {
-    const user = await readyClient.users.fetch(userId);
-    console.log(`fetched user > @${user.username}(${user.id})`)
-    })
+    config.profile.users.forEach(async (userId) => {
+      const user = await readyClient.users.fetch(userId);
+      console.log(`fetched user > @${user.username}(${user.id})`);
+    });
   }
-})
+});
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
@@ -84,17 +97,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
     console.error(error);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
-        content: 'There was an error while executing this command!',
+        content: "There was an error while executing this command!",
         flags: MessageFlags.Ephemeral,
       });
     } else {
       await interaction.reply({
-        content: 'There was an error while executing this command!',
+        content: "There was an error while executing this command!",
         flags: MessageFlags.Ephemeral,
       });
     }
   }
-})
+});
 
 client.on(Events.UserUpdate, async (oldUser, newUser) => {
   if (!config.profile.users.includes(oldUser.id)) return;
@@ -103,106 +116,134 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
   const channel = client.channels.cache.get(channelId);
 
   if (config.profile.username && oldUser.username != newUser.username) {
-    console.log(`updated username > @${oldUser.username} to @${newUser.username}`);
-    const embed = embedTemplate(`${oldUser.username} changes username`)
-      .setDescription(
-        'old\n' +
-        '```\n' +
+    console.log(
+      `updated username > @${oldUser.username} to @${newUser.username}`,
+    );
+    const embed = embedTemplate(
+      `${oldUser.username} changes username`,
+    ).setDescription(
+      "old\n" +
+        "```\n" +
         oldUser.username +
-        '\n```\n' +
-        'new\n' +
-        '```\n' +
+        "\n```\n" +
+        "new\n" +
+        "```\n" +
         newUser.username +
-        '\n```'
-      );
+        "\n```",
+    );
     await channel.send({ embeds: [embed] });
 
     if (config.debug) console.log(embed);
-    console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+    console.log(
+      `${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`,
+    );
   }
 
-  if (config.profile.displayName && oldUser.displayName != newUser.displayName) {
-    console.log(`updated displayName @${oldUser.username} > ${oldUser.displayName} to ${newUser.displayName}`);
-    const embed = embedTemplate(`${oldUser.username} changed displayName`)
-      .setDescription(
-        'old\n' +
-        '```\n' +
+  if (
+    config.profile.displayName &&
+    oldUser.displayName != newUser.displayName
+  ) {
+    console.log(
+      `updated displayName @${oldUser.username} > ${oldUser.displayName} to ${newUser.displayName}`,
+    );
+    const embed = embedTemplate(
+      `${oldUser.username} changed displayName`,
+    ).setDescription(
+      "old\n" +
+        "```\n" +
         oldUser.displayName +
-        '\n```\n' +
-        'new\n' +
-        '```\n' +
+        "\n```\n" +
+        "new\n" +
+        "```\n" +
         newUser.displayName +
-        '\n```'
-      );
+        "\n```",
+    );
     await channel.send({ embeds: [embed] });
 
     if (config.debug) console.log(embed);
-    console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+    console.log(
+      `${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`,
+    );
   }
 
   if (config.profile.avatar && oldUser.avatar != newUser.avatar) {
-    console.log(`updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`);
-    const url = newUser.displayAvatarURL({ size: 4096});
-    const embed = embedTemplate(`${oldUser.username} changes avatar`)
-      .setImage(url);
+    console.log(
+      `updated avatar @${oldUser.username}(${oldUser.id}) > ${oldUser.avatar} to ${newUser.avatar}`,
+    );
+    const url = newUser.displayAvatarURL({ size: 4096 });
+    const embed = embedTemplate(`${oldUser.username} changes avatar`).setImage(
+      url,
+    );
     await channel.send({ embeds: [embed] });
 
     if (config.debug) console.log(embed);
-    console.log(`${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`);
+    console.log(
+      `${channel.id} @${client.user.tag}(${client.user.id}) > [EMBED]`,
+    );
 
     if (newUser.avatar) {
       const urlPath = new URL(url).pathname;
       const fileName = path.basename(urlPath);
       const dest = path.join(attachmentsPath, "avatars", newUser.id, fileName);
       await download(url, dest);
-    };
+    }
   }
-})
+});
 
-client.on(Events.MessageCreate, async msg => {
+client.on(Events.MessageCreate, async (msg) => {
   if (msg.author.bot) return;
-  if (!(config.guilds.includes(msg.guild.id) || config.channels.includes(msg.channel.id))) return;
+  if (
+    !(
+      config.guilds.includes(msg.guild.id) ||
+      config.channels.includes(msg.channel.id)
+    )
+  )
+    return;
 
   if (config.debug) console.log(msg);
-  console.log(`${msg.channel.id} @${msg.author.username}(${msg.author.id}) > ${msg.content}`);
+  console.log(
+    `${msg.channel.id} @${msg.author.username}(${msg.author.id}) > ${msg.content}`,
+  );
 
-  const dir = path.join(attachmentsPath, msg.channel.id, msg.id)
+  const dir = path.join(attachmentsPath, msg.channel.id, msg.id);
   const timestamp = msg.createdAt;
   const attachments = msg.attachments;
-  attachments.forEach(async attachment => {
+  attachments.forEach(async (attachment) => {
     const dest = path.join(dir, attachment.name);
     await download(attachment.url, dest);
     await updateTimestamp(dest, timestamp);
-  })
+  });
 
   if (msg.messageSnapshots) {
     const snapshots = msg.messageSnapshots;
-    snapshots.forEach(snapshot => {
+    snapshots.forEach((snapshot) => {
       const attachments = snapshot.attachments;
-      attachments.forEach(async attachment => {
+      attachments.forEach(async (attachment) => {
         const dest = path.join(dir, attachment.name);
         await download(attachment.url, dest);
         await updateTimestamp(dest, timestamp);
-      })
-    })
+      });
+    });
   }
 
   if (config.twitter.enable) {
     const result = getVxtwitterUrls(msg.content);
     if (!result.length) return;
-    result.forEach(async vxtwitterUrl => {
+    result.forEach(async (vxtwitterUrl) => {
       const mediaURLs = await getTwitterMediaURLs(vxtwitterUrl);
-      mediaURLs.forEach(async mediaURL => {
+      mediaURLs.forEach(async (mediaURL) => {
         const url = new URL(mediaURL);
         const urlPath = url.pathname;
-        const urlFormat = url.searchParams.get('format');
-        const fileName = urlFormat ? `${path.basename(urlPath)}.${urlFormat}` : path.basename(urlPath);
+        const urlFormat = url.searchParams.get("format");
+        const fileName = urlFormat
+          ? `${path.basename(urlPath)}.${urlFormat}`
+          : path.basename(urlPath);
         const dest = path.join(dir, fileName);
         await download(mediaURL, dest);
         await updateTimestamp(dest, timestamp);
-      })
-    })
+      });
+    });
   }
-})
+});
 
 client.login(config.token);
