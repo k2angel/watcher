@@ -1,0 +1,10 @@
+.direnv
+.git
+.github
+node_modules
+
+.envrc
+.gitignore
+config.example.json
+flake.lock
+flake.nix

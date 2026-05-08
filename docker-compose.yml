@@ -1,0 +1,7 @@
+services:
+  app:
+    image: ghcr.io/k2angel/watcher:latest
+    userns_mode: keep-id
+    volumes:
+      - ./config.json:/usr/src/app/config.json:ro
+      - ./attachments:/usr/src/app/attachments:rw
